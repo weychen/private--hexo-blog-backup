@@ -1,0 +1,42 @@
+#+TITLE: how-to-write-notes-with-hexo
+#+AUTHOR: weychen
+#+EMAIL: weychen@163.com
+#+DATE: 2016-09-29
+#+LAYOUT: post
+#+OPTIONS: ^:nil
+#+TAGS:
+#+CATEGORIES: notes
+#+DESCRIPTON:
+
+* 如何用hexo记录笔记
+
+在主题的配置文件 \themes\next\_config.yml里
+#+BEGIN_SRC conf
+menu:
+home: /
+categories: /categories
+tags: /tags
+archives: /archives
+#这里是关键
+notes: /categories/notes
+#+END_SRC
+
+#+BEGIN_HTML
+<!--more-->
+#+END_HTML
+
+新建文件时候这样写就行了
+=#+CATEGORIES: notes=
+我用过的是org-mode,如果是md文件的话：
+=categories: notes=
+
+我们不仅仅可以建一级目录还可以建二级目录
+#+BEGIN_SRC conf
+#这里是新增的，编程是一级目录，Python是二级目录
+python: /categories/编程/Python/
+新建文件时候这样写就行了
+categories:
+- 编程
+- Python
+
+#+END_SRC

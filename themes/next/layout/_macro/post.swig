@@ -56,6 +56,9 @@
               {{ date(post.date, config.date_format) }}
             </time>
           </span>
+          {% if not is_index %}
+             <span id="busuanzi_container_page_pv">&nbsp;&nbsp;|&nbsp;&nbsp;阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
+          {% endif %}
 
           {% if post.categories and post.categories.length %}
             <span class="post-category" >

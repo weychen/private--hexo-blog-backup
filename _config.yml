@@ -46,7 +46,7 @@ i18n_dir: :lang
 skip_render:
 
 # Writing
-new_post_name: :title.md # File name of new posts
+new_post_name: :year-:month-:day-:title.md # File name of new posts
 default_layout: post
 titlecase: false # Transform title into titlecase
 external_link: true # Open external links in new tab
@@ -80,9 +80,14 @@ pagination_dir: page
 
 # Extensions
 ## Plugins: https://hexo.io/plugins/
-#plugins:
-# baidusitemap: # 需要安装插件 npm install hexo-generator-baidu-sitemap@0.1.1 --save
-#  path: baidusitemap.xml
+plugins:
+sitemap:
+baidusitemap: # 需要安装插件 npm install hexo-generator-baidu-sitemap@0.1.1 --save
+  path: baidusitemap.xml
+
+search:
+  path: search.xml
+  field: post
 
 feed:
   type: atom       #feed 类型 (atom/rss2)
@@ -104,10 +109,9 @@ deploy:
 org:
   emacs: '/usr/local/Cellar/emacs/25.1/Emacs.app/Contents/MacOS/Emacs'
   common: |
-          #+OPTIONS: toc:nil
+          #+OPTIONS: toc:nil num:nil
           #+BIND: org-html-postamble \"Last Updated %C.</br>Render by <a href='https://github.com/CodeFalling/hexo-renderer-org'>hexo-renderer-org</a> with %c\"
   cachedir: './hexo-org-cache/'
-
 # ---------------下面选项需要对应插件的支持---------------
 # npm install hexo-generator-index --save
 # npm install hexo-generator-archive --save

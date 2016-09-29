@@ -1,0 +1,101 @@
+#+TITLE: set-up-blog-with-hexo+org-mode
+#+AUTHOR: weychen
+#+EMAIL: weychen@163.com
+#+DATE: 2016-09-28
+#+LAYOUT: post
+#+OPTIONS: ^:nil
+#+TAGS: how-to-blog
+#+CATEGORIES: emacs
+#+DESCRIPTON: hexo+org-mode搭建自己的博客系统
+* 为什么有这份教程
+  学习emacs，被emacs的org-mode所深深吸引，我也开始入坑，早就想着要写博客，于是乎我选择了比较流行和好用的hexo。
+  当我开始搭建我的博客环境的时候，发现网上几乎没有一份清晰完整的教程来指导我的工作，我东拼西凑，摸着石头过河，自己花了近两天的时候终于搭建好了我的环境。
+所以我想写这样的一份教程，他是面对emacs入门用户的，如果你像我一样，刚刚入门emacs，自己又喜欢写blog，并且陷入emacs的org-mode所带来的惊喜而无法自拔
+那么，这篇文章应该能帮到你。
+#+BEGIN_HTML
+<!--more-->
+#+END_HTML
+* hexo 安装
+  关于这一部分的操作，有很多前人给我们留下了宝贵的经验。
+  [[http://lovenight.github.io/2015/11/10/Hexo-3-1-1-%25E9%259D%2599%25E6%2580%2581%25E5%258D%259A%25E5%25AE%25A2%25E6%2590%25AD%25E5%25BB%25BA%25E6%258C%2587%25E5%258D%2597/][Hexo 3.1.1 静态博客搭建指南 | 岁月如歌]]
+* emacs 对于hexo 的支持
+  这里主要是两个东西：blog-admin 和 hexo-renderer-org。
+  我的配置参考：[[http://blog.pschorf.com/blog/2016/02/28/spacemacs-blogging/][Blogging in Spacemacs - pschorf's blog]]
+** blog-admin
+  下面是我的配置：
+  #+BEGIN_SRC lisp
+(defun org-page/init-blog-admin ()
+  (use-package blog-admin
+    :config (progn (setq blog-admin-backend-type 'hexo   ;; 后台类型
+                         blog-admin-backend-path "~/org/blog"                ;; hexo 博客所在路径
+                         blog-admin-backend-new-post-in-drafts t             ;; 默认在drafts创建文章
+                         blog-admin-backend-new-post-with-same-name-dir nil  ;; 默认不创建相应的目录，因为我目前没有发现这个目录的作用，先干掉 
+                         ;; blog-admin-backend-org-page-drafts "_drafts"     ;;
+                         blog-admin-backend-hexo-config-file "_config.yml"   ;; hexo 配置文件
+                         )
+                   ;; (evilified-state-evilify-map blog-admin-mode-map :mode blog-admin-mode)
+                   (spacemacs/set-leader-keys
+                     "abb" 'blog-admin-start)                    ;; 绑定space快捷键
+                   (add-hook 'blog-admin-backend-after-new-post-hook 'find-file) ;; Open post after create new post
+                   (setq blog-admin-backend-hexo-template-org-post  ;; post模板
+                         "#+TITLE: %s
+                         #+AUTHOR: weychen
+                         #+EMAIL: weychen@163.com
+                         #+DATE: %s
+                         #+LAYOUT: post
+                         #+TAGS:
+                         #+CATEGORIES:
+                         #+DESCRIPTON:
+                         ")
+                         )))
+  #+END_SRC
+  说明：我使用的是spacemacs，关于为什么使用spacemacs，这里不做详细叙述。上述的代码配置我放在我自定义的"org-page"层中，spacemacs允许我们定义自己的layer。
+** hexo-renderer-org
+   进入hexo 博客的根目录，在我的系统中是"~/org/blog"，安装hexo-renderer-org
+   #+BEGIN_SRC shell
+   npm install hexo-renderer-org --save
+   #+END_SRC
+   然后在你的hexo配置文件:```_config.yml```中添加如下代码：
+   #+BEGIN_SRC conf
+org:
+  emacs: '/Applications/Emacs.app/Contents/MacOS/Emacs'
+  common: |
+          #+OPTIONS: toc:nil
+          #+BIND: org-html-postamble \"Last Updated %C.</br>Render by <a href='https://github.com/CodeFalling/hexo-renderer-org'>hexo-renderer-org</a> with %c\"
+  cachedir: './hexo-org-cache/'
+   #+END_SRC
+   其中的OPTIONS 选项是针对org导出为HTML所做的一些选项约束，toc的意思是导出时为每个标题编序号。
+   BIND是导出的最底层显示的东西，上述的代码的将一段html代码赋值给org-html-postamble变量。
+   read more 标签：将下述的代码放置在你的org文件中，将在你的blog中显示为<阅读更多>。
+   #+BEGIN_SRC lisp
+#+BEGIN_HTML
+<!--more-->
+#+END_HTML
+   #+END_SRC
+
+* 图片上传
+  博客的图片截图我参考了"子龙山人"的配置--[[https://zilongshanren.com/blog/2015-07-19-add-org-mode-support.html#orgheadline9][使用 Org-mode 来写博客 | 子龙山人]]，他这篇文章中所定制的截图功能的小函数十分地实用。
+  博客的图片存储我使用的是七牛云存储，网上也有不少的教程是使用qrsync这个工具的，qrsync是七牛出品的一个同步工具，现在已经废弃，七牛开发团队推荐用qshell来替代qrsync
+七牛开发者中心给出了。在七牛开发者中心给出了详细的说明文档:[[http://o9gnz92z5.bkt.clouddn.com/code/v6/tool/qshell.html][qshell 命令行工具]]，我采用其中的qshell qupload命令。
+  我针对qshell中的qupload定制了一个emacs elisp函数:
+  #+BEGIN_SRC lisp
+(defun octopress-qrsync (command)
+  (let ((command-str (format "~/bin/qshell qupload %s" command))) ;; 调用qshell qupload command
+    (shell-command-to-string command-str)))
+(defun octopress-upimg ()
+  (interactive)
+  (octopress-qrsync "~/org/blog/images/posts/conf.json")          ;; qshell qupload 所需要的上传配置文件
+  (message "Up OK"))
+  #+END_SRC
+  在emacs中执行octopress-upimg将自动上传~/org/blog/images/posts文件夹中的文件。
+* Conclusion
+  通过这两天的琢磨，感觉自己对于emacs的使用熟悉了不少，遇到问题，也知道了该怎么去解决了。
+  学习emacs一定要拿上来就用，不要说先去学懂lisp语言再来使用emacs，这样学习成本太高，也没有兴趣。兴趣才是最好的老师，何况我们现在的学习不像高中那般有老师的督促，
+有同学的相互激励，没有带着兴趣去学习一门技术，无法坚持一个星期。
+* Reference
+  - 1.[[http://lovenight.github.io/2015/11/10/Hexo-3-1-1-%25E9%259D%2599%25E6%2580%2581%25E5%258D%259A%25E5%25AE%25A2%25E6%2590%25AD%25E5%25BB%25BA%25E6%258C%2587%25E5%258D%2597/][“Hexo 3.1.1 静态博客搭建指南 | 岁月如歌”]] 
+  - 2.[[https://zilongshanren.com/blog/2015-07-19-add-org-mode-support.html][“使用 Org-mode 来写博客 | 子龙山人”🔊]]
+  - 3.[[http://blog.pschorf.com/blog/2016/02/28/spacemacs-blogging/][Blogging in Spacemacs - pschorf's blog]]
+  - 4.[[https://github.com/CodeFalling/blog-admin][CodeFalling/blog-admin: Write blog in emacs with hexo/org-page/nikola]]
+  - 5.[[https://github.com/weychen/hexo-renderer-org][weychen/hexo-renderer-org: Hexo renderer plugin for emacs org-mode]]
+  - 6.[[https://github.com/qiniu/qshell/wiki/qupload][qupload · qiniu/qshell Wiki]]

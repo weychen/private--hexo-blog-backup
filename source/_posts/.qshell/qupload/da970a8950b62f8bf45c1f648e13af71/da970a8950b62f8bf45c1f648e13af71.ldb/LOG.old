@@ -1,0 +1,10 @@
+=============== Sep 27, 2016 (CST) ===============
+23:09:54.103156 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+23:09:54.103334 db@open opening
+23:09:54.103390 journal@recovery F·1
+23:09:54.103715 journal@recovery recovering @1
+23:09:54.104332 memdb@flush created L0@2 N·3 S·240B "/Us..txt,v1":"/Us..png,v3"
+23:09:54.105214 db@janitor F·3 G·0
+23:09:54.105240 db@open done T·1.893613ms
+23:09:54.390716 db@close closing
+23:09:54.390867 db@close done T·147.84µs

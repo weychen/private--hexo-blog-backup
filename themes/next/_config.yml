@@ -29,14 +29,12 @@ canonical: true
 # When running the site in a subdirectory (e.g. domain.tld/blog), remove the leading slash (/archives -> archives)
 menu:
   home: /
-  #categories: /categories
-  #about: /about
+  categories: /categories
+  about: /about
   archives: /archives
   tags: /tags
-  php: /php
-  notes: /notes
-  emacs: /emacs
-  #commonweal: /404.html
+  notes: /categories/notes
+  commonweal: /404.html
 
 
 # Enable/Disable menu icons.
@@ -53,6 +51,7 @@ menu_icons:
   tags: tags
   archives: archive
   commonweal: heartbeat
+  notes: book
 
 
 
@@ -204,7 +203,7 @@ custom_logo:
 # Available value:
 #    normal | night | night eighties | night blue | night bright
 # https://github.com/chriskempson/tomorrow-theme
-highlight_theme: night blue 
+highlight_theme: night blue
 
 
 # Automatically scroll page to section which is under <!-- more --> mark.

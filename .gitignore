@@ -5,3 +5,5 @@ db.json
 public/
 .deploy*/
 hexo-org-cache/
+images/
+node_modules/
